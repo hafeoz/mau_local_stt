@@ -157,6 +157,8 @@ class MauLocalSTT(Plugin):
         if self.config['backend'] == 'whisper' and WHISPER_INSTALLED:
             # transcribe using whisper
             initial_prompt = self.config['whisper'].get('initial_prompt', None)
+            if initial_prompt is not None:
+                self.log.debug(f"Using initial prompt {initial_prompt}")
             transc = await transcribe_audio_whisper(data, self.whisper_model, content.info.mimetype, self.log, initial_prompt)
         elif self.config['backend'] == 'vosk' and VOSK_INSTALLED:
             # transcribe using vosk
