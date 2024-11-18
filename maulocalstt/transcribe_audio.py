@@ -6,7 +6,7 @@ from mautrix.util.logging import TraceLogger
 import numpy as np
 import json
 
-from .import_backends import vosk, VOSK_INSTALLED, pywhispercpp, WHISPER_INSTALLED
+from .import_backends import vosk, VOSK_INSTALLED, pywhispercpp, to_timestamp, WHISPER_INSTALLED
 
 if WHISPER_INSTALLED:
     import numpy as np
@@ -49,7 +49,7 @@ def _run_whisper(whisper_model: pywhispercpp.Model, data: np.ndarray, logger: Tr
         args = {}
         if initial_prompt is not None:
             args['initial_prompt'] = initial_prompt
-        return '\n'.join([ f"[{s.t0} - {s.t1}] {s.text}" for s in whisper_model.transcribe(data, **args) ])
+        return '\n\n'.join([ f"[{to_timestamp(s.t0)} - {to_timestamp(s.t1)}] {s.text}" for s in whisper_model.transcribe(data, **args) ])
     except Exception as e:
         logger.exception("Exception when running Whisper", exc_info=e)
     return "Error"
