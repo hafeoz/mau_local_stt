@@ -6,7 +6,7 @@ from mautrix.util.logging import TraceLogger
 import numpy as np
 import json
 
-from .import_backends import vosk, VOSK_INSTALLED, whispercpp, WHISPER_INSTALLED
+from .import_backends import vosk, VOSK_INSTALLED, pywhispercpp, WHISPER_INSTALLED
 
 if WHISPER_INSTALLED:
     import numpy as np
@@ -44,15 +44,15 @@ async def _run_ffmpeg(data: bytes, mimeType: str, logger: TraceLogger) -> Tuple[
     # logger.debug(stderr.decode('utf8'))
 
 
-def _run_whisper(whisper_model: whispercpp.Whisper, data: np.ndarray, logger: TraceLogger):
+def _run_whisper(whisper_model: pywhispercpp.Model, data: np.ndarray, logger: TraceLogger) -> str:
     try:
-        return whisper_model.transcribe(data)
+        return '\n'.join([ f"[{s.t0} - {s.t1}] {s.text}" for s in whisper_model.transcribe(data) ])
     except Exception as e:
         logger.exception("Exception when running Whisper", exc_info=e)
     return "Error"
 
 
-async def transcribe_audio_whisper(data: bytes, whisper_model: whispercpp.Whisper, mimeType: str,
+async def transcribe_audio_whisper(data: bytes, whisper_model: pywhispercpp.Model, mimeType: str,
                                    logger: TraceLogger) -> str:
     if not WHISPER_INSTALLED:
         return ""

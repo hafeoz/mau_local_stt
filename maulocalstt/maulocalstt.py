@@ -12,7 +12,7 @@ from mautrix.util.config import BaseProxyConfig
 from .config import Config
 from .transcribe_audio import transcribe_audio_whisper, transcribe_audio_vosk
 
-from .import_backends import vosk, VOSK_INSTALLED, whispercpp, WHISPER_INSTALLED
+from .import_backends import vosk, VOSK_INSTALLED, pywhispercpp, WHISPER_INSTALLED
 
 
 async def download_encrypted_media(file: EncryptedFile, client: MatrixClient) -> bytes:
@@ -48,6 +48,8 @@ class MauLocalSTT(Plugin):
         self.current_backend = None
 
         self.last_whisper_model_name = None
+        self.last_whisper_language = None
+        self.last_whisper_translate = None
         self.last_vosk_model_path = None
 
     allowed_msgtypes: Tuple[MessageType, ...] = (MessageType.AUDIO,)
@@ -60,7 +62,9 @@ class MauLocalSTT(Plugin):
             if WHISPER_INSTALLED:
                 # if the current backend is not whisper, or the model has changed
                 if self.current_backend != 'whisper' or \
-                        self.last_whisper_model_name != self.config['whisper']['model_name']:
+                        self.last_whisper_model_name != self.config['whisper']['model_name'] or \
+                        self.last_whisper_language != self.config['whisper']['language'] or \
+                        self.last_whisper_translate != self.config['whisper']['translate']:
                     # delete the old model
                     if self.whisper_model is not None:
                         del self.whisper_model
@@ -72,16 +76,16 @@ class MauLocalSTT(Plugin):
                     self.current_backend = None
 
                     # load the (new) model
-                    self.whisper_model = whispercpp.Whisper.from_pretrained(self.config['whisper']["model_name"],
-                                                                            basedir=self.config['whisper']['base_dir'])
+                    self.whisper_model = pywhispercpp.Model(self.config['whisper']["model_name"],
+                                                                            models_dir=self.config['whisper']['base_dir'],
+                                                                            language=self.config['whisper']['language'],
+                                                                            translate=self.config['whisper']['translate'])
 
                     self.current_backend = 'whisper'
                     self.last_whisper_model_name = self.config['whisper']['model_name']
 
-                self.whisper_model.params.language = self.config['whisper']['language']
-                self.whisper_model.params.translate = self.config['whisper']['translate']
-            else:  # whispercpp is not installed
-                self.log.error("Backend is set to 'whisper', but whispercpp is not installed (pip install whispercpp)")
+            else:  # pywhispercpp is not installed
+                self.log.error("Backend is set to 'whisper', but pywhispercpp is not installed (pip install pywhispercpp)")
 
         if self.config['backend'] == 'vosk':
             if VOSK_INSTALLED:

@@ -1,13 +1,13 @@
-# Import whispercpp
 from typing import Any
 
+# Import pywhispercpp
 try:
-    import whispercpp
+    import pywhispercpp.model as pywhispercpp
 
-    WHISPER_INSTALLED = True  # whispercpp is installed
+    WHISPER_INSTALLED = True  # pywhispercpp is installed
 except ModuleNotFoundError:
-    whispercpp = type("whispercpp", (object,), {"Whisper": Any})  # Set whispercpp for type hints
-    WHISPER_INSTALLED = False  # whispercpp is not installed
+    pywhispercpp = type("pywhispercpp", (object,), {"Model": Any})  # Set pywhispercpp for type hints
+    WHISPER_INSTALLED = False  # pywhispercpp is not installed
 
 # Import vosk
 try:
