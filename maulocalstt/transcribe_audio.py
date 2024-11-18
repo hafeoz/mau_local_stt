@@ -44,16 +44,19 @@ async def _run_ffmpeg(data: bytes, mimeType: str, logger: TraceLogger) -> Tuple[
     # logger.debug(stderr.decode('utf8'))
 
 
-def _run_whisper(whisper_model: pywhispercpp.Model, data: np.ndarray, logger: TraceLogger) -> str:
+def _run_whisper(whisper_model: pywhispercpp.Model, data: np.ndarray, logger: TraceLogger, initial_prompt: Optional[str]) -> str:
     try:
-        return '\n'.join([ f"[{s.t0} - {s.t1}] {s.text}" for s in whisper_model.transcribe(data) ])
+        args = {}
+        if initial_prompt is not None:
+            args['initial_prompt'] = initial_prompt
+        return '\n'.join([ f"[{s.t0} - {s.t1}] {s.text}" for s in whisper_model.transcribe(data, **args) ])
     except Exception as e:
         logger.exception("Exception when running Whisper", exc_info=e)
     return "Error"
 
 
 async def transcribe_audio_whisper(data: bytes, whisper_model: pywhispercpp.Model, mimeType: str,
-                                   logger: TraceLogger) -> str:
+                                   logger: TraceLogger, initial_prompt: Optional[str]) -> str:
     if not WHISPER_INSTALLED:
         return ""
 
@@ -63,7 +66,7 @@ async def transcribe_audio_whisper(data: bytes, whisper_model: pywhispercpp.Mode
     data_numpy = np.frombuffer(data_converted, np.int16).flatten().astype(np.float32) / 32768.0
 
     loop = asyncio.get_event_loop()
-    result = await loop.run_in_executor(None, _run_whisper, whisper_model, data_numpy, logger)
+    result = await loop.run_in_executor(None, _run_whisper, whisper_model, data_numpy, logger, initial_prompt)
     return result
 
 

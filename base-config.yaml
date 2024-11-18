@@ -22,3 +22,5 @@ whisper:
     language: auto
     # Set to true to translate the audio transcription to english
     translate: false
+    # To set some initial prompt for each transcription, uncomment below:
+    # initial_prompt: Following is a conversation between a friend and me.
