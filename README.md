@@ -1,6 +1,6 @@
 # mau_local_stt
 
-:no_entry: [DEPRECATED] This fork was made to [fix some niche problem](https://github.com/ElishaAz/mau_local_stt/compare/main...hafeoz:mau_local_stt:main) I encountered when using [ElishaAz/mau_local_stt](https://github.com/ElishaAz/mau_local_stt). As I continue to use this plugin more and more, I've decided to rewrite from scratch to fit in more personal features. Therefore, all future development will happen in https://github.com/hafeoz/mau_whisper repo instead.
+> :no_entry: **[DEPRECATED] This fork was made to [fix some niche problem](https://github.com/ElishaAz/mau_local_stt/compare/main...hafeoz:mau_local_stt:main) I encountered when using [ElishaAz/mau_local_stt](https://github.com/ElishaAz/mau_local_stt). As I continue to use this plugin more and more, I've decided to rewrite from scratch to fit in more personal features. Therefore, all future development will happen in https://github.com/hafeoz/mau_whisper repo instead.**
 
 A Maubot to transcribe audio messages in matrix rooms using local open-source libraries
 
